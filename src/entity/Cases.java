@@ -1,7 +1,7 @@
 package entity;
 
 public class Cases {
-    private int caseId;
+    private int caseID;
     private String caseDescription;
     private int incidentsID;
 
@@ -10,19 +10,19 @@ public class Cases {
 
     }
 
-    public Cases(int caseId, String caseDescription, int incidentsID) {
-        this.caseId = caseId;
+    public Cases(int caseID, String caseDescription, int incidentsID) {
+        this.caseID = caseID;
         this.caseDescription = caseDescription;
         this.incidentsID = incidentsID;
     }
 
     // getters and setters
-    public int getCaseId() {
-        return caseId;
+    public int getCaseID() {
+        return caseID;
     }
 
-    public void setCaseId(int caseId) {
-        this.caseId = caseId;
+    public void setCaseID(int caseID) {
+        this.caseID = caseID;
     }
 
     public String getCaseDescription() {
@@ -43,7 +43,7 @@ public class Cases {
 
     @Override
     public String toString() {
-        return "Cases [caseId=" + caseId + ", caseDescription=" + caseDescription +
+        return "Cases [caseId=" + caseID + ", caseDescription=" + caseDescription +
                 ",\nIncident ID =" + incidentsID + "]\n";
     }
 
