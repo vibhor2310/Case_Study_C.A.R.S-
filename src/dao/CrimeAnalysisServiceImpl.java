@@ -174,10 +174,11 @@ public class CrimeAnalysisServiceImpl implements ICrimeAnalysisService{
     @Override
     public boolean updateCaseDetails(Cases caseDetails) {
         connection = DBConnection.getConnection();
-        String sql = "UPDATE Cases SET CaseDescription = ? WHERE CaseID = ?";
+        String sql = "UPDATE Cases SET CaseDescription = ?,IncidentID= ? WHERE CaseID = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, caseDetails.getCaseDescription());
-            ps.setInt(2, caseDetails.getCaseID());
+            ps.setInt(2, caseDetails.getIncidentID());
+            ps.setInt(3, caseDetails.getCaseID());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

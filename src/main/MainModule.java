@@ -247,11 +247,15 @@ public class MainModule {
         System.out.print("Enter case ID: ");
         int caseId = scanner.nextInt();
         scanner.nextLine(); // Consume the newline character
+        System.out.println("Enter Incident ID: ");
+        int incidentID = scanner.nextInt();
+        scanner.nextLine();
         System.out.print("Enter new case description: ");
         String caseDescription = scanner.nextLine();
 
         Cases caseObj = new Cases();
         caseObj.setCaseID(caseId);
+        caseObj.setIncidentID(incidentID);
         caseObj.setCaseDescription(caseDescription);
 
         if (service.updateCaseDetails(caseObj)) {
