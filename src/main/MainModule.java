@@ -5,17 +5,22 @@ import dao.ICrimeAnalysisService;
 import entity.Cases;
 import entity.Incidents;
 import entity.Reports;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+
 
 public class MainModule {
 
-    public static void main(String[] args) {
-        ICrimeAnalysisService service= new CrimeAnalysisServiceImpl();
-        System.out.println("Welcome to Crime Analysis and Reporting System");
 
-        Scanner scanner = new Scanner(System.in);
+    static Scanner scanner = new Scanner(System.in);
+    public static void main(String[] args) throws ClassNotFoundException {
+        ICrimeAnalysisService service= new CrimeAnalysisServiceImpl();
+        System.out.println("Welcome to Crime Analysis and Reporting System\n");
 
         while (true) {
+            System.out.println();
             System.out .println("1. Create Incident");
             System.out.println("2. Update Incident Status");
             System.out.println("3. Get Incidents in Date Range");
@@ -32,28 +37,28 @@ public class MainModule {
 
             switch (choice) {
                 case 1:
-                    createIncident(service, scanner);
+                    createIncident(service);
                     break;
                 case 2:
-                    updateIncidentStatus(service, scanner);
+                    updateIncidentStatus(service);
                     break;
                 case 3:
-                    getIncidentsInDateRange(service, scanner);
+                    getIncidentsInDateRange(service);
                     break;
                 case 4:
-                    searchIncidents(service, scanner);
+                    searchIncidents(service);
                     break;
                 case 5:
-                    generateIncidentReport(service, scanner);
+                    generateIncidentReport(service);
                     break;
                 case 6:
-                    createCase(service, scanner);
+                    createCase(service);
                     break;
                 case 7:
-                    getCaseDetails(service, scanner);
+                    getCaseDetails(service);
                     break;
                 case 8:
-                    updateCaseDetails(service, scanner);
+                    updateCaseDetails(service);
                     break;
                 case 9:
                     getAllCases(service);
@@ -67,17 +72,20 @@ public class MainModule {
         }
 
     }
-    private static void createIncident (ICrimeAnalysisService service, Scanner scanner) {
+    private static void createIncident(ICrimeAnalysisService service) {
         Incidents incident = new Incidents();
-        System.out.println("Enter incident ID");
+        System.out.print("Enter incident ID: ");
         incident.setIncidentID(scanner.nextInt());
+        scanner.nextLine(); // Consume the newline character
         System.out.print("Enter incident type: ");
         incident.setIncidentType(scanner.nextLine());
         System.out.print("Enter incident date (yyyy-MM-dd): ");
         String incidentDateStr = scanner.nextLine();
         try {
-            Date incidentDate = new Date(incidentDateStr);
-            incident.setIncidentDate(incidentDate);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate incidentDate = LocalDate.parse(incidentDateStr, formatter);
+            java.sql.Date sqlDate = java.sql.Date.valueOf(incidentDate);
+            incident.setIncidentDate(sqlDate);
         } catch (Exception e) {
             System.out.println("Invalid date format. Please use yyyy-MM-dd.");
             return;
@@ -87,7 +95,7 @@ public class MainModule {
         System.out.print("Enter description: ");
         incident.setDescription(scanner.nextLine());
         System.out.print("Enter status: ");
-        incident.setStatus(scanner.nextLine());
+        incident.setStatus(scanner.next());
         System.out.print("Enter victim ID: ");
         incident.setVictimID(scanner.nextInt());
         scanner.nextLine(); // Consume the newline character
@@ -102,7 +110,7 @@ public class MainModule {
         }
     }
 
-    private static void updateIncidentStatus(ICrimeAnalysisService service, Scanner scanner) {
+    private static void updateIncidentStatus(ICrimeAnalysisService service) {
         System.out.print("Enter incident ID: ");
         int incidentId = scanner.nextInt();
         scanner.nextLine(); // Consume the newline character
@@ -116,15 +124,19 @@ public class MainModule {
         }
     }
 
-    private static void getIncidentsInDateRange(ICrimeAnalysisService service, Scanner scanner) {
+    private static void getIncidentsInDateRange(ICrimeAnalysisService service) {
         System.out.print("Enter start date (yyyy-MM-dd): ");
-        String startDateStr = scanner.nextLine();
+        String startDateStr = scanner.next();
         System.out.print("Enter end date (yyyy-MM-dd): ");
-        String endDateStr = scanner.nextLine();
+        String endDateStr = scanner.next();
+
         try {
-            Date startDate = new Date(startDateStr);
-            Date endDate = new Date(endDateStr);
-            Collection<Incidents> incidents = service.getIncidentsInDateRange(startDate, endDate);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate startDate = LocalDate.parse(startDateStr, formatter);
+            LocalDate endDate = LocalDate.parse(endDateStr, formatter);
+            java.sql.Date sqlStartDate = java.sql.Date.valueOf(startDate);
+            java.sql.Date sqlEndDate = java.sql.Date.valueOf(endDate);
+            Collection<Incidents> incidents = service.getIncidentsInDateRange(sqlStartDate,sqlEndDate);
 
             if (incidents.isEmpty()) {
                 System.out.println("No incidents found in the given date range.");
@@ -146,9 +158,9 @@ public class MainModule {
         }
     }
 
-    private static void searchIncidents(ICrimeAnalysisService service, Scanner scanner) {
+    private static void searchIncidents(ICrimeAnalysisService service) {
         System.out.print("Enter search keyword: ");
-        String keyword = scanner.nextLine();
+        String keyword = scanner.next();
 
         Collection<Incidents> incidents = service.searchIncidents(keyword);
 
@@ -169,7 +181,7 @@ public class MainModule {
         }
     }
 
-    private static void generateIncidentReport(ICrimeAnalysisService service, Scanner scanner) {
+    private static void generateIncidentReport(ICrimeAnalysisService service) {
         System.out.print("Enter incident ID: ");
         int incidentId = scanner.nextInt();
         scanner.nextLine(); // Consume the newline character
@@ -193,43 +205,28 @@ public class MainModule {
         }
     }
 
-    private static void createCase(ICrimeAnalysisService service, Scanner scanner) {
+    private static void createCase(ICrimeAnalysisService service) {
+
+        System.out.print("Enter CaseID: ");
+        int caseID = scanner.nextInt();
+        scanner.nextLine();
         System.out.print("Enter case description: ");
         String caseDescription = scanner.nextLine();
-
-        System.out.print("Enter number of incidents: ");
-        int numIncidents = scanner.nextInt();
-        scanner.nextLine(); // Consume the newline character
-
-        Collection<Incidents> incidents = new ArrayList<>();
-
-        for (int i = 0; i < numIncidents; i++) {
-            System.out.print("Enter incident ID " + (i + 1) + ": ");
-            int incidentId = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline character
-
-            Incidents incident = new Incidents();
-            incident.setIncidentID(incidentId);
-
-            incidents.add(incident);
-        }
-
-        Cases caseObj = service.createCase(caseDescription, incidents);
+        System.out.print("Enter incident ID : ");
+        int incidentId = scanner.nextInt();
+        Cases caseObj = service.createCase(caseID,caseDescription, incidentId);
 
         if (caseObj != null) {
             System.out.println("Case created successfully.");
             System.out.println("Case ID: " + caseObj.getCaseID());
             System.out.println("Case Description: " + caseObj.getCaseDescription());
-            System.out.println("Incident IDs: ");
-            for (Incidents incident : incidents) {
-                System.out.println(incident.getIncidentID());
-            }
+            System.out.println("Incident IDs: "+caseObj.getIncidentID());
         } else {
             System.out.println("Failed to create case.");
         }
     }
 
-    private static void getCaseDetails(ICrimeAnalysisService service, Scanner scanner) {
+    private static void getCaseDetails(ICrimeAnalysisService service) {
         System.out.print("Enter case ID: ");
         int caseId = scanner.nextInt();
         scanner.nextLine(); // Consume the newline character
@@ -240,13 +237,13 @@ public class MainModule {
             System.out.println("Case Details:");
             System.out.println("Case ID: " + caseObj.getCaseID());
             System.out.println("Case Description: " + caseObj.getCaseDescription());
-            System.out.println("Incident ID: " + caseObj.getIncidentsID());
+            System.out.println("Incident ID: " + caseObj.getIncidentID());
         } else {
             System.out.println("Failed to retrieve case details.");
         }
     }
 
-    private static void updateCaseDetails(ICrimeAnalysisService service, Scanner scanner) {
+    private static void updateCaseDetails(ICrimeAnalysisService service) {
         System.out.print("Enter case ID: ");
         int caseId = scanner.nextInt();
         scanner.nextLine(); // Consume the newline character
@@ -273,7 +270,7 @@ public class MainModule {
             for (Cases caseObj : cases) {
                 System.out.println("Case ID: " + caseObj.getCaseID());
                 System.out.println("Case Description: " + caseObj.getCaseDescription());
-                System.out.println("Incident ID: " + caseObj.getIncidentsID());
+                System.out.println("Incident ID: " + caseObj.getIncidentID());
                 System.out.println();
             }
         }
