@@ -3,6 +3,7 @@ package dao;
 import entity.Cases;
 import entity.Incidents;
 import entity.Reports;
+import exception.IncidentNumberNotFoundException;
 import util.DBConnection;
 
 import java.sql.Connection;
@@ -16,10 +17,6 @@ import java.util.List;
 
 public class CrimeAnalysisServiceImpl implements ICrimeAnalysisService{
     private Connection connection;
-
-//    public CrimeAnalysisServiceImpl() throws ClassNotFoundException {
-//        this.connection = DBConnection.getConnection();
-//    }
 
     @Override
     public boolean createIncident(Incidents incident) {
@@ -49,7 +46,14 @@ public class CrimeAnalysisServiceImpl implements ICrimeAnalysisService{
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status);
             ps.setInt(2, incidentId);
-            return ps.executeUpdate() > 0;
+            int output=ps.executeUpdate();
+            if(output==0) {
+                throw new IncidentNumberNotFoundException();
+            }
+            return output > 0;
+        }  catch (IncidentNumberNotFoundException e) {
+            System.out.println(e.getMessage());
+            return false;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -158,10 +162,10 @@ public class CrimeAnalysisServiceImpl implements ICrimeAnalysisService{
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, caseId);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
+            if(rs.next()) {
 
                 String caseDescription = rs.getString("CaseDescription");
-                int incidentID= rs.getInt("Caseid");
+                int incidentID= rs.getInt("IncidentID");
 
                 return new Cases(caseId, caseDescription,incidentID);
             }
@@ -203,5 +207,13 @@ public class CrimeAnalysisServiceImpl implements ICrimeAnalysisService{
             e.printStackTrace();
         }
         return cases;
+    }
+    @Override
+    public void closeConnection() throws SQLException {
+        try {
+            if (connection != null) connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
