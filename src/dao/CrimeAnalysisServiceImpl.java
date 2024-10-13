@@ -18,10 +18,14 @@ import java.util.List;
 public class CrimeAnalysisServiceImpl implements ICrimeAnalysisService{
     private Connection connection;
 
+    public CrimeAnalysisServiceImpl() throws ClassNotFoundException {
+        this.connection = DBConnection.getConnection();
+    }
+
     @Override
     public boolean createIncident(Incidents incident) {
         // TODO Auto-generated method stub
-        connection = DBConnection.getConnection();
+//        connection = DBConnection.getConnection();
         String sql = "INSERT INTO Incidents (IncidentID,IncidentType, IncidentDate, Location, Description, Status, VictimID, SuspectID) VALUES (?,?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1,incident.getIncidentID());
@@ -41,7 +45,7 @@ public class CrimeAnalysisServiceImpl implements ICrimeAnalysisService{
 
     @Override
     public boolean updateIncidentStatus(String status, int incidentId) {
-        connection = DBConnection.getConnection();
+//        connection = DBConnection.getConnection();
         String sql = "UPDATE Incidents SET Status = ? WHERE IncidentID = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, status);
@@ -62,7 +66,7 @@ public class CrimeAnalysisServiceImpl implements ICrimeAnalysisService{
 
     @Override
     public Collection<Incidents> getIncidentsInDateRange(Date startDate, Date endDate) {
-        connection= DBConnection.getConnection();
+//        connection= DBConnection.getConnection();
         List<Incidents> incidents = new ArrayList<>();
         String sql = "SELECT * FROM Incidents WHERE IncidentDate BETWEEN ? AND ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -89,7 +93,7 @@ public class CrimeAnalysisServiceImpl implements ICrimeAnalysisService{
 
     @Override
     public Collection<Incidents> searchIncidents(String criteria) {
-        connection = DBConnection.getConnection();
+//        connection = DBConnection.getConnection();
         Collection<Incidents> incidents = new ArrayList<>();
         String sql = "SELECT * FROM Incidents WHERE IncidentType LIKE ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -115,7 +119,7 @@ public class CrimeAnalysisServiceImpl implements ICrimeAnalysisService{
 
     @Override
     public Reports generateIncidentReport(Incidents incident) {
-        connection = DBConnection.getConnection();
+//        connection = DBConnection.getConnection();
         String sql = "SELECT * FROM Reports WHERE incidentID = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, incident.getIncidentID());
@@ -138,7 +142,7 @@ public class CrimeAnalysisServiceImpl implements ICrimeAnalysisService{
 
     @Override
     public Cases createCase(int caseid,String caseDescription,int incidentid) {
-        connection = DBConnection.getConnection();
+//        connection = DBConnection.getConnection();
         String sql = "INSERT INTO Cases (caseid,CaseDescription, incidentID) VALUES (?,?,?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, caseid);
@@ -157,7 +161,7 @@ public class CrimeAnalysisServiceImpl implements ICrimeAnalysisService{
 
     @Override
     public Cases getCaseDetails(int caseId) {
-        connection = DBConnection.getConnection();
+//        connection = DBConnection.getConnection();
         String sql = "SELECT * FROM Cases WHERE CaseID = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, caseId);
@@ -177,7 +181,7 @@ public class CrimeAnalysisServiceImpl implements ICrimeAnalysisService{
 
     @Override
     public boolean updateCaseDetails(Cases caseDetails) {
-        connection = DBConnection.getConnection();
+//        connection = DBConnection.getConnection();
         String sql = "UPDATE Cases SET CaseDescription = ?,IncidentID= ? WHERE CaseID = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, caseDetails.getCaseDescription());
@@ -192,7 +196,7 @@ public class CrimeAnalysisServiceImpl implements ICrimeAnalysisService{
 
     @Override
     public Collection<Cases> getAllCases() {
-        connection = DBConnection.getConnection();
+//        connection = DBConnection.getConnection();
         Collection<Cases> cases = new ArrayList<>();
         String sql = "SELECT * FROM Cases";
         try (PreparedStatement ps = connection.prepareStatement(sql);
